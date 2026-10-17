@@ -1,0 +1,23 @@
+- name: Deploy script to Samba DC
+  hosts: dc
+  become: true
+  tasks:
+    - name: Copy script
+      ansible.builtin.copy:
+        src: parsecsv.sh
+        dest: /usr/local/sbin/parsecsv.sh
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Copy user CSV
+      ansible.builtin.copy:
+        src: users.csv
+        dest: /root/users.csv
+        owner: root
+        group: root
+        mode: "0600"
+
+    - name: Create users from CSV
+      ansible.builtin.command: /usr/local/sbin/parsecsv.sh /root/users.csv
+
