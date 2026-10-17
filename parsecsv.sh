@@ -67,6 +67,7 @@ main() {
   while IFS=',' read -r user pass dept first last; do
     process "$user" "$pass" "$dept" "$first" "$last" || continue
   done < "$CSV_FILE" 2>> "$LOG_FILE"
+  rm -f "$CSV_FILE"
 }
 
 main "$@"
