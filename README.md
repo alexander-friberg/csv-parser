@@ -147,8 +147,16 @@ Everything is logged to `/srv/admin.log`:
 - `SKIP`: the user already exists
 - `FAILED`: a step failed, with the step name, the user and the exit code
 - `DONE`: summary at the end of the run
+- `INTERRUPTED`: the run was stopped with Ctrl+C (exit code 130)
+- `TERMINATED`: the run was stopped with `kill` (SIGTERM, exit code 143)
+- `ABORTED`: the script stopped early, with its exit code. Logged after `INTERRUPTED` and `TERMINATED`, and when the script crashes, for example on an unbound variable
 
-A failure for one user doesn't stop the rest of the run.
+A failure for one user doesn't stop the rest of the run. A run that stops early has no `DONE` line and ends with `ABORTED`:
+
+```
+2026-10-18T14:02:11+02:00 INTERRUPTED
+2026-10-18T14:02:11+02:00 ABORTED exit=130
+```
 
 ## Re-running
 
