@@ -23,13 +23,13 @@ check_user() {
 ensure_ou() {
   local dept=$1
   samba-tool ou list | grep -qxF "OU=$dept" && return 0
-  samba-tool ou create "OU=$dept,$BASE_DN" >/dev/null/ && log "OK created OU $dept"
+  samba-tool ou create "OU=$dept,$BASE_DN" >/dev/null && log "OK created OU $dept"
 }
 
 ensure_group() {
   local dept=$1
   samba-tool group show "$dept" >/dev/null 2>&1 && return 0
-  samba-tool group add "$dept" --groupou="OU=$dept" >/dev/null/ && log "OK created group $dept"
+  samba-tool group add "$dept" --groupou="OU=$dept" >/dev/null && log "OK created group $dept"
 }
 
 create_user() {
@@ -46,7 +46,7 @@ create_user() {
 
 add_to_group() {
   local user=$1 group=$2
-  samba-tool group addmembers "$group" "$user" >/dev/null/ && log "OK added $user to group $group"
+  samba-tool group addmembers "$group" "$user" >/dev/null && log "OK added $user to group $group"
 }
 
 create_home() {
@@ -56,7 +56,7 @@ create_home() {
   chown "$user" "$dir"
   chmod 700 "$dir"
   setfacl -m "g:domain admins:rwx" -m "d:g:domain admins:rwx" "$dir"
-  log "OK created home $home"
+  log "OK created home $dir"
 }
 
 process() {
