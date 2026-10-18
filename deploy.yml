@@ -1,5 +1,5 @@
-- name: Deploy script to Samba DC
-  hosts: dc
+- name: Create users from CSV
+  hosts: useradmin
   become: true
   tasks:
     - name: Copy script
@@ -18,6 +18,24 @@
         group: root
         mode: "0600"
 
+    - name: Copy Kerberos keytab
+      ansible.builtin.copy:
+        src: files/parsecsv.keytab
+        dest: /etc/parsecsv.keytab
+        owner: root
+        group: root
+        mode: "0600"
+      when: dc_url is defined
+
+    - name: Get Kerberos ticket
+      ansible.builtin.command: kinit -k -t /etc/parsecsv.keytab svc-useradmin
+      when: dc_url is defined
+
     - name: Create users from CSV
       ansible.builtin.command: /usr/local/sbin/parsecsv.sh /root/users.csv
+      environment:
+        DC_URL: "{{ dc_url | default('') }}"
 
+    - name: Remove Kerberos ticket
+      ansible.builtin.command: kdestroy
+      when: dc_url is defined
