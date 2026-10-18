@@ -10,6 +10,9 @@ DC_URL="${DC_URL:-}"
 
 log() { printf '%s %s\n' "$(date -Iseconds)" "$*" >> "$LOG_FILE"; }
 try() { "$@" || { local rc=$?; log "FAILED step=$1 user=$2 exit=$rc"; return "$rc"; }; }
+trap 'rc=$?; [ "$rc" -ne 0 ] && log "ABORTED exit=$rc"' EXIT
+trap 'log "INTERRUPTED"; exit 130' INT
+trap 'log "TERMINATED"; exit 143' TERM
 st() {
   if [ -n "$DC_URL" ]; then
     samba-tool "$@" -H "$DC_URL" --use-kerberos=required
